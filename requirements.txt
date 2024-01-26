@@ -1,1 +1,1 @@
-python-docx
+docx==0.2.4
