@@ -5,14 +5,12 @@ import shutil
 import streamlit as st
 import requests
 import pandas as pd
-import json
 import os
-
-from utils import format_time, initialize_session_state, read_csv_files, order_files
+from utils import format_time, initialize_session_state, read_csv_files, order_files, allow_update
 
 # API base URL
 # base_url = "http://127.0.0.1:5000/" # development url
-base_url = "https://hassanrasool.pythonanywhere.com/"
+base_url = "https://hassanrasool.pythonanywhere.com/" # production url
 
 # Define the Streamlit app
 st.title("FAST Spring 2024 Timetable Viewer")
@@ -36,10 +34,17 @@ def get_last_update_time():
         st.success("Timetable last updated on {}".format(response.json()))
     else:
         st.error(f"Failed to fetch timetable last update date. Status code: {response.status_code}")
+
+    return allow_update(response.json())
+
         
-get_last_update_time()
-# Checkbox for getting the latest timetable
-get_latest_timetable = st.checkbox("Get Latest Timetable")
+can_update, time_difference = get_last_update_time()
+
+if can_update:
+    # Checkbox for getting the latest timetable
+    get_latest_timetable = st.checkbox("Get Latest Timetable")
+else:
+    st.markdown(f"TimeTable was updated {time_difference} ago. Max waiting time to update is more than 30 minutes. The above modification time is according to server timezone (GMT).")
 
 # Create a multi-select widget for selecting subjects
 selected_subjects = st.multiselect("Select Subjects:", all_subjects)
@@ -93,7 +98,7 @@ if st.button("Fetch Time Table"):
         # selected_subjects = ['Fund of NLP (AI-JK)', 'PPIT (AI-J)', 'Art Neural Net (AI-J)', 'Info Sec (AI-J)', 'Game Theory (AI-JK)']
         # print('Selected Subjects : ', selected_subjects)
         
-        if get_latest_timetable:
+        if can_update and get_latest_timetable:
             update_timetable()  # Call the function to update the timetable
 
         time_table_url = base_url + "time-table"
