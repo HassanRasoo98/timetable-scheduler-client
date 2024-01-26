@@ -1,8 +1,65 @@
 import os
 import re
+import shutil
+import requests
 import pandas as pd
 import streamlit as st
+from docx import Document
 from datetime import datetime, timedelta, timezone
+
+# Function to update the timetable
+def get_last_update_time(base_url):
+    # st.info("Updating timetable...")  # You can customize the message
+    update_url = base_url + "get_modification_time"
+    response = requests.get(update_url)
+    # print(response.json())
+    if response.status_code == 200:
+        st.success("Timetable last updated on {}".format(response.json()))
+    else:
+        st.error(f"Failed to fetch timetable last update date. Status code: {response.status_code}")
+
+    return allow_update(response.json())
+
+def results_handler(result):
+    # Create a subfolder named 'results' in the current working directory
+    results_folder = 'results'
+    
+    # remove previouisly fetched results to make space for new ones
+    if os.path.exists(os.path.join(os.getcwd(), results_folder)):
+        shutil.rmtree(results_folder)
+        # print('file removed')
+        
+    os.makedirs(results_folder, exist_ok=True)
+    
+    result.drop_duplicates(inplace=True, ignore_index=True)
+    result['Start_Time'] = result['Start_Time'].apply(format_time)
+    # result['End_Time'] = result['End_Time'].apply(format_time)
+    result['Start_Time'] = pd.to_datetime(result['Start_Time'], format='%I:%M %p')
+
+    # Group by 'Day', sort each group, and save as a separate CSV file in the 'results' subfolder
+    for day, group in result.groupby('Day'):
+        sorted_group = group.sort_values(by='Start_Time')
+        csv_file_path = os.path.join(results_folder, f'{day.replace(".xlsx", "")}.csv')
+        sorted_group.drop(['Day', 'Start_Time', 'End_Time'], axis=1, inplace=True)
+        
+        # Desired column order
+        desired_order = ['Subject', 'Class', 'Time']
+
+        # Rearrange columns
+        sorted_group = sorted_group[desired_order]
+        sorted_group.to_csv(csv_file_path, index=False)
+
+    # print("CSV files saved successfully in the 'results' subfolder after sorting and converting time to datetime.")
+
+# Function to update the timetable
+def update_timetable(base_url):
+    st.info("Updating timetable...")  # You can customize the message
+    update_url = base_url + "update-timetable"
+    response = requests.get(update_url)
+    if response.status_code == 200:
+        st.success("Timetable updated successfully.")
+    else:
+        st.error(f"Failed to update timetable. Fatching timetable from previous version. Status code: {response.status_code}")
 
 # Function to read CSV files from a folder
 def read_csv_files(folder_path):
@@ -10,7 +67,7 @@ def read_csv_files(folder_path):
     # sort the files according to the day names
     csv_files = sorted(csv_files, key=order_files)
     
-    print('csv files : ', csv_files)
+    # print('csv files : ', csv_files)
     dfs = {file: pd.read_csv(os.path.join(folder_path, file)) for file in csv_files}
     
     return dfs
@@ -47,14 +104,14 @@ def format_time(time):
         return time + ' PM'
          
 def allow_update(provided_datetime_str):
-    print(provided_datetime_str)
+    # print(provided_datetime_str)
     provided_datetime = datetime.strptime(provided_datetime_str, "%a, %d %b %Y %H:%M:%S %Z")
     provided_datetime = datetime.strptime(provided_datetime_str, "%a, %d %b %Y %H:%M:%S %Z")
     provided_datetime = provided_datetime.replace(tzinfo=timezone.utc)
 
     # Current datetime with timezone
     current_datetime = datetime.now(timezone.utc)
-    print(current_datetime)
+    # print(current_datetime)
 
     # Calculate the difference
     time_difference = current_datetime - provided_datetime
@@ -68,7 +125,7 @@ def allow_update(provided_datetime_str):
     minutes = int(minutes)
     seconds = int(seconds)
 
-    print("Time difference:", time_difference)
+    # print("Time difference:", time_difference)
     
     time_string = "{} h, {} m, {} s".format(hours, minutes, seconds)
 
@@ -80,3 +137,57 @@ def allow_update(provided_datetime_str):
         return False, time_string # do not allow update, last update was less than 30 minutes ago
     else:
         return True, time_string
+
+def create_file():
+    # Specify the subfolder containing CSV files
+    csv_folder = 'results'
+
+    # Create a Word document
+    doc = Document()
+    doc.add_heading('Timetable Spring 2024', level=0)  # Add the title
+    
+    files = os.listdir(csv_folder)
+    files = sorted(files, key=order_files)
+
+    # Loop through all CSV files in the subfolder
+    for csv_file in files:
+        # Read the CSV file into a Pandas DataFrame
+        df = pd.read_csv(os.path.join(csv_folder, csv_file))
+
+        title = csv_file.split('.')[0]
+        # Add a section for the CSV file name
+        doc.add_heading(title, level=1)
+
+        # Add a table to the Word document
+        num_rows, num_cols = df.shape
+        table = doc.add_table(rows=num_rows + 1, cols=num_cols)
+        table.autofit = True
+
+        # Add column headers to the table
+        for col_num, col_name in enumerate(df.columns):
+            table.cell(0, col_num).text = col_name
+
+        # Add data to the table
+        for row_num, row_data in enumerate(df.itertuples(), start=1):
+            for col_num, value in enumerate(row_data[1:], start=0):
+                table.cell(row_num, col_num).text = str(value)
+                
+    # Add the concluding lines
+    doc.add_paragraph("\nIf you enjoyed using this app, please provide feedback. "
+                      "If you want to support upcoming projects like this one, "
+                      "you can motivate me financially :)\n")
+    doc.add_paragraph("01397991921003 - HBL")
+                
+    if os.path.exists('combined_data.docx'):
+        os.remove('combined_data.docx')
+
+    # if os.path.exists('combined_data.pdf'):
+    #     os.remove('combined_data.pdf')
+
+    # Save the Word document
+    doc.save('combined_data.docx')
+    print('Word document saved.')
+
+    # # Convert Word document to PDF
+    # convert("combined_data.docx", "combined_data.pdf")
+    # print('PDF document saved.')
