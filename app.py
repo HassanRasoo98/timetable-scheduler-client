@@ -36,29 +36,13 @@ def get_last_update_time():
         st.success("Timetable last updated on {}".format(response.json()))
     else:
         st.error(f"Failed to fetch timetable last update date. Status code: {response.status_code}")
-
-# Load selected subjects from file
-def load_selected_subjects():
-    if os.path.exists("selected_subjects.json"):
-        with open("selected_subjects.json", "r") as file:
-            return json.load(file)
-    else:
-        return []
-
-# Save selected subjects to file
-def save_selected_subjects(selected_subjects):
-    with open("selected_subjects.json", "w") as file:
-        json.dump(selected_subjects, file)
         
 get_last_update_time()
 # Checkbox for getting the latest timetable
 get_latest_timetable = st.checkbox("Get Latest Timetable")
 
 # Create a multi-select widget for selecting subjects
-selected_subjects = st.multiselect("Select Subjects:", all_subjects, default=load_selected_subjects())
-
-# Save selected subjects to file
-save_selected_subjects(selected_subjects)
+selected_subjects = st.multiselect("Select Subjects:", all_subjects)
 
 def results_handler(result):
     # Create a subfolder named 'results' in the current working directory
