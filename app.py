@@ -55,6 +55,8 @@ with tab1:
 
     # Create a multi-select widget for selecting subjects
     selected_subjects = st.multiselect("Select Subjects:", all_subjects)
+    if '05:20 - 08:05 (inc. 10 min. break)' in selected_subjects:
+        selected_subjects.remove('05:20 - 08:05 (inc. 10 min. break)')
 
     # Fetch and display the time table for selected subjects
     if st.button("Fetch Time Table"):    
