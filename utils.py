@@ -186,8 +186,29 @@ def create_file():
 
     # Save the Word document
     doc.save('combined_data.docx')
-    print('Word document saved.')
+    # print('Word document saved.')
 
     # # Convert Word document to PDF
     # convert("combined_data.docx", "combined_data.pdf")
     # print('PDF document saved.')
+    
+# Function to fetch current rating from the server
+def fetch_current_rating(base_url):
+    # Assuming your server provides the current rating at the '/current-rating' endpoint
+    current_rating_url = base_url + "/current-rating"
+    response = requests.get(current_rating_url)
+    if response.status_code == 200:
+        return response.json()["rating"], response.json()["total votes"]
+    else:
+        st.error("Failed to fetch current rating.")
+        return 0, 0
+    
+
+def send_rating_to_server(rating, base_url):
+    # Assuming you have a server endpoint to send the rating via POST request
+    endpoint = base_url + 'submit-rating'
+    data = {"rating": rating}
+    response = requests.post(endpoint, json=data)
+    if response.status_code == 200:
+        st.success('Thank you for rating us.')
+        
