@@ -10,8 +10,8 @@ from utils import get_last_update_time, initialize_session_state, read_csv_files
         create_file, results_handler, update_timetable, send_rating_to_server, fetch_current_rating
 
 # API base URL
-base_url = "http://127.0.0.1:5000/" # development url
-# base_url = "https://hassanrasool.pythonanywhere.com/" # production url
+# base_url = "http://127.0.0.1:5000/" # development url
+base_url = "https://hassanrasool.pythonanywhere.com/" # production url
 
 # Fetch the current rating from the server
 current_rating, total = fetch_current_rating(base_url)
