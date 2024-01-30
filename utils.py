@@ -11,8 +11,8 @@ from datetime import datetime, timedelta, timezone
 from streamlit_star_rating import st_star_rating
 
 def get_base_url():
-    return "http://127.0.0.1:5000/" # development url
-    # return "https://hassanrasool.pythonanywhere.com/" # production url
+    # return "http://127.0.0.1:5000/" # development url
+    return "https://hassanrasool.pythonanywhere.com/" # production url
 
 # Function to update the timetable
 def get_last_update_time(base_url):
