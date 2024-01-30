@@ -1,3 +1,5 @@
+# all the methods/functions used in the app.py file have been defined in this file
+
 import os
 import re
 import shutil
@@ -6,6 +8,11 @@ import pandas as pd
 import streamlit as st
 from docx import Document
 from datetime import datetime, timedelta, timezone
+from streamlit_star_rating import st_star_rating
+
+def get_base_url():
+    return "http://127.0.0.1:5000/" # development url
+    # return "https://hassanrasool.pythonanywhere.com/" # production url
 
 # Function to update the timetable
 def get_last_update_time(base_url):
@@ -121,13 +128,12 @@ def allow_update(provided_datetime_str):
     # Format the time in a human-readable way
     hours, remainder = divmod(total_seconds, 3600)
     minutes, seconds = divmod(remainder, 60)
-    hours = int(hours)
     minutes = int(minutes)
     seconds = int(seconds)
 
     # print("Time difference:", time_difference)
     
-    time_string = "{} h, {} m, {} s".format(hours, minutes, seconds)
+    time_string = "{} m {} s".format(minutes, seconds)
 
     # Specify the maximum allowed duration (30 minutes)
     max_allowed_duration = timedelta(minutes=30)
@@ -198,10 +204,12 @@ def fetch_current_rating(base_url):
     current_rating_url = base_url + "/current-rating"
     response = requests.get(current_rating_url)
     if response.status_code == 200:
-        return response.json()["rating"], response.json()["total votes"]
+        rating = response.json()["rating"]
+        rating = round(rating, 2)
+        return rating
     else:
         st.error("Failed to fetch current rating.")
-        return 0, 0
+        return 0
     
 
 def send_rating_to_server(rating, base_url):
@@ -209,6 +217,63 @@ def send_rating_to_server(rating, base_url):
     endpoint = base_url + 'submit-rating'
     data = {"rating": rating}
     response = requests.post(endpoint, json=data)
-    if response.status_code == 200:
-        st.success('Thank you for rating us.')
+    # if response.status_code == 200:
+        # st.success('Thank you for rating us.')
         
+# Display the fetched rating on the top left corner using st.sidebar
+def show_rating(base_url):
+    # Fetch the current rating from the server
+    current_rating, total = fetch_current_rating(base_url)
+    with st.sidebar:
+        st.write("Current Rating:")
+        st.write(current_rating)
+        
+        st.write("Total Votes")
+        st.write(total)
+
+
+def get_user_rating_handler(base_url):
+    st.divider()
+    stars = st_star_rating("Please rate your experience", size = 20, maxValue=5, defaultValue=None, key="rating")
+    st.divider()
+    send_rating_to_server(stars, base_url)
+    
+def subscribe_to_updates(base_url, email):
+    email_url = base_url + 'subscribe-email'
+    data = {"email": email}
+    response = requests.post(email_url, json=data)
+    if response.status_code == 200:
+        st.success('Thank you for subscribing. You will now get notified by email about new updates!')
+
+def store_feedback(feedback_type, rating, feedback_text, contact_email, 
+                   name, batch, department, roll_num):
+    
+    # For demonstration, you can store feedback in a CSV file
+    feedback_data = {'Feedback Type': [feedback_type],
+                     'Feedback': [feedback_text],
+                     'Contact Email': [contact_email],
+                     'Name': name,
+                     'Batch': batch,
+                     'Department': department,
+                     'Roll Number': roll_num}
+    
+    send_rating_to_server(rating, get_base_url())
+        
+    # send to server to store the file
+    feedback_url = get_base_url() + 'post-feedback'
+    response = requests.post(feedback_url, json=feedback_data)
+    
+    if response.status_code == 200:
+        st.success('Your feedback has been recorded.')
+    else:
+        st.error(f'Error in submitting feedback. Status {response.status_code}')
+    
+def email_checker(email):
+    # Regular expression pattern for validating email addresses
+    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    
+    # Check if the email matches the pattern
+    if re.match(pattern, email):
+        return True
+    else:
+        return False
