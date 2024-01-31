@@ -24,6 +24,7 @@ Check back often to see what's coming! You can request for features and give sug
 features = [
     "Examination Scheduler (Sessionals + Finals)",
     "Examination Seating Plan Manager",
+    "Clash Detection"
 ]
 
 # Display upcoming features
