@@ -343,7 +343,7 @@ def tab2_empty_classroom_handler():
     
     # Extract current day and time in Pakistan time
     current_day = current_date_time_pakistan.strftime("%A")
-    time = current_date_time_pakistan.strftime('%I:%M %p')
+    time = current_date_time_pakistan.strftime('%I:%M%p')
     
     print("Current day in Pakistan:", current_day)
     print("Current time in Pakistan:", time)
