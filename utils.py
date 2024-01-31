@@ -2,6 +2,7 @@
 
 import os
 import re
+import pytz
 import shutil
 import requests
 import pandas as pd
@@ -333,13 +334,29 @@ def tab1_empty_classroom_handler():
 def tab2_empty_classroom_handler():
     # Get current date and time
     current_date_time = datetime.now()
+    
+    # Define time zone for Pakistan
+    pakistan_time_zone = pytz.timezone('Asia/Karachi')
+    
+    # Convert current date and time to Pakistan time
+    current_date_time_pakistan = current_date_time.astimezone(pakistan_time_zone)
+    
+    # Extract current day and time in Pakistan time
+    current_day = current_date_time_pakistan.strftime("%A")
+    time = current_date_time_pakistan.strftime('%I:%M %p')
+    
+    print("Current day in Pakistan:", current_day_pakistan)
+    print("Current time in Pakistan:", time_pakistan)
+    
+    # # Get current date and time
+    # current_date_time = datetime.now()
 
-    # Extract current day and time
-    current_day = current_date_time.strftime("%A")
-    time = current_date_time.strftime('%I:%M%p')
+    # # Extract current day and time
+    # current_day = current_date_time.strftime("%A")
+    # time = current_date_time.strftime('%I:%M%p')
 
-    print("Current day:", current_day)
-    print("Current time:", time)
+    # print("Current day:", current_day)
+    # print("Current time:", time)
     
     now = {'current-day': current_day.strip(), 'current-time': time}
     
