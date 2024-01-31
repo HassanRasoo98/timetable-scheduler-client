@@ -338,8 +338,8 @@ def tab2_empty_classroom_handler():
     current_day = current_date_time.strftime("%A")
     time = current_date_time.strftime('%I:%M%p')
 
-    # print("Current day:", current_day)
-    # print("Current time:", current_time)
+    print("Current day:", current_day)
+    print("Current time:", current_time)
     
     now = {'current-day': current_day.strip(), 'current-time': time}
     
