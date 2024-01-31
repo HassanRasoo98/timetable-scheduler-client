@@ -255,7 +255,8 @@ def store_feedback(feedback_type, rating, feedback_text, contact_email,
                      'Name': name,
                      'Batch': batch,
                      'Department': department,
-                     'Roll Number': roll_num}
+                     'Roll Number': roll_num,
+                     'Rating': rating}
     
     send_rating_to_server(rating, get_base_url())
         
@@ -277,3 +278,94 @@ def email_checker(email):
         return True
     else:
         return False
+
+def tab1_empty_classroom_handler():
+    base_url = get_base_url()
+    # Fetch a list of all files
+    all_files_url = base_url + "get_files"
+    response = requests.get(all_files_url)
+    files = None
+
+    if response.status_code == 200:
+        files = response.json()
+    else:
+        st.error(f"Failed to fetch files. Status code: {response.status_code}")
+        st.stop()
+        
+        # Create a multi-select widget for selecting subjects
+    selected_file = st.selectbox("Select Day:", files)   
+    # print('selected file : ', selected_file)
+
+    # Create two radio buttons side by side
+    stype = st.radio('Find in : ', ('Room', 'Lab'))
+    url = base_url + "selected-file"
+    payload = {"file": selected_file, "selection_type": stype}
+    response1 = requests.post(url, json=payload)    
+    timeslots = response1.json()
+    # print(timeslots)
+
+    with st.form(key="form"):
+        selected_timeslot = st.selectbox("Select a timeslot:", timeslots)
+        submit_button = st.form_submit_button(label="Find Empty Rooms")
+        # print(f'selected_timeslot {selected_timeslot}')  
+        
+    if submit_button:
+        # print(f'selected_timeslot after clicking button {selected_timeslot}') 
+        # print('button clicked')
+        free_room_url = base_url + "get-free-room"
+        # print(free_room_url)
+        payload = {"timeslot": selected_timeslot}
+        free_room_url_response = requests.post(free_room_url, json=payload)
+        
+        if free_room_url_response.status_code == 200:
+            result = free_room_url_response.json()
+            df = pd.DataFrame(result, columns=['Free Rooms'])
+
+            st.table(df)
+            
+        else:
+            st.error(f"Failed to fetch timetable. Status code: {free_room_url_response.status_code}")
+            # print(free_room_url_response)
+            
+    st.divider()
+
+
+def tab2_empty_classroom_handler():
+    # Get current date and time
+    current_date_time = datetime.now()
+
+    # Extract current day and time
+    current_day = current_date_time.strftime("%A")
+    time = current_date_time.strftime('%I:%M%p')
+
+    # print("Current day:", current_day)
+    # print("Current time:", current_time)
+    
+    now = {'current-day': current_day.strip(), 'current-time': time}
+    
+    # send this data to API endpoint
+    now_url = get_base_url() + 'now-empty'
+    response = requests.post(now_url, json=now)
+    
+    if response.status_code == 200:
+        classes = response.json()['result1']
+        labs = response.json()['result2']
+        
+        st.subheader('Free Classes')
+        # Display upcoming features
+        for class_ in classes:
+            st.write(f"- {class_}")
+        
+        st.subheader('Free Labs')
+        # Display upcoming features
+        for lab in labs:
+            st.write(f"- {lab}")
+            
+    # current time does not match any time slots (against office timings)
+    elif response.status_code == 201:
+        st.error(response.json()['message'])
+        
+    # any other error
+    else:
+        st.error('An error occured')
+        print(response.text)

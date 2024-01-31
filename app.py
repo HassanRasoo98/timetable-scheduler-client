@@ -5,8 +5,20 @@ import os
 import pandas as pd
 import requests
 import streamlit as st
+from st_pages import Page, show_pages
 from utils import create_file, get_base_url, initialize_session_state, order_files, \
     read_csv_files, results_handler
+    
+# Specify what pages should be shown in the sidebar, and what their titles
+# and icons should be
+show_pages([
+    Page("app.py", "Home", "🏠"),
+    Page("pages/page2.py", "Find Empty Classrooms", "🔎"),
+    Page("pages/page3.py", "Update TimeTable", "🔃"),
+    Page("pages/page4.py", "About", "💡"),
+    Page("pages/page5.py", "Feedback", "💬")
+])
+
 
 base_url = get_base_url()
 
@@ -16,7 +28,7 @@ base_url = get_base_url()
 st.title("FAST Spring 2024 Timetable Viewer")
 
 st.markdown("""
-Enter your subjects in box below and click on 'Fetch Timetable' to retrieve your personal schedule.            
+Enter your subjects in box below and click on 'Fetch Timetable' to retrieve your personal schedule.       
 """)
 
 # Fetch a list of all subjects
