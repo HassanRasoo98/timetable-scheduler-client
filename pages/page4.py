@@ -41,9 +41,9 @@ Enter your email below to receive notifications about the latest updates and fea
 
 email = st.text_input('Email')
 if st.button('Subscribe'):
-    '''
-        I need to integrate a Gmail API system that verifies the entered email
-    '''
+    # '''
+    #     I need to integrate a Gmail API system that verifies the entered email
+    # '''
     if email_checker(email):
         subscribe_to_updates(base_url, email)
     else:
