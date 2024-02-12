@@ -10,7 +10,7 @@ current_rating = fetch_current_rating(base_url)
 st.write("Rating: ", current_rating)
 
 st.markdown("""
-The Timetable Scheduler App was created to acommodate the unique needs of the students of computing department of FAST National University, Islamabad Campus. The Timetable provided by the department is combined for all batches, departments and sections. Making it difficult for students to navigate the file to make their schedules. The purpose of this app is to simplify the process of making personalised timetable accurately and easily.
+The Timetable Scheduler App was created to address the unique needs of the students of computing department of FAST National University, Islamabad Campus. The Timetable provided by the department is combined for all batches, departments and sections. Making it difficult for students to navigate the file to make their schedules. The purpose of this app is to simplify the process of making personalised timetable accurately and easily.
 """)
 
 st.subheader('Upcoming Features')
