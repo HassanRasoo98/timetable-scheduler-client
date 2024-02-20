@@ -1,5 +1,5 @@
 # run command
-# streamlit run Home.py
+# streamlit run app.py
 
 import os
 import pandas as pd
@@ -15,6 +15,7 @@ show_pages([
     Page("app.py", "Home", "🏠"),
     Page("pages/page2.py", "Find Empty Classrooms", "🔎"),
     Page("pages/page3.py", "Update TimeTable", "🔃"),
+    Page("pages/page6.py", "Exam Scheduler (NEW!)", "🗓️"),
     Page("pages/page4.py", "About", "💡"),
     Page("pages/page5.py", "Feedback", "💬")
 ])
