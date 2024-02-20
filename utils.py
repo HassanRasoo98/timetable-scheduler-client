@@ -28,9 +28,10 @@ def get_last_update_time(base_url):
 
     return allow_update(response.json())
 
-def results_handler(result):
+def results_handler(result, folder='results'):
+    print(result)
     # Create a subfolder named 'results' in the current working directory
-    results_folder = 'results'
+    results_folder = folder
     
     # remove previouisly fetched results to make space for new ones
     if os.path.exists(os.path.join(os.getcwd(), results_folder)):
@@ -40,25 +41,53 @@ def results_handler(result):
     os.makedirs(results_folder, exist_ok=True)
     
     result.drop_duplicates(inplace=True, ignore_index=True)
-    result['Start_Time'] = result['Start_Time'].apply(format_time)
-    # result['End_Time'] = result['End_Time'].apply(format_time)
-    result['Start_Time'] = pd.to_datetime(result['Start_Time'], format='%I:%M %p')
+    
+    try:
+        result['Start_Time'] = result['Start_Time'].apply(format_time)
+        # result['End_Time'] = result['End_Time'].apply(format_time)
+        result['Start_Time'] = pd.to_datetime(result['Start_Time'], format='%I:%M %p')
 
-    # Group by 'Day', sort each group, and save as a separate CSV file in the 'results' subfolder
-    for day, group in result.groupby('Day'):
-        sorted_group = group.sort_values(by='Start_Time')
-        csv_file_path = os.path.join(results_folder, f'{day.replace(".xlsx", "")}.csv')
-        sorted_group.drop(['Day', 'Start_Time', 'End_Time'], axis=1, inplace=True)
-        
-        # Desired column order
-        desired_order = ['Subject', 'Class', 'Time']
+        # Group by 'Day', sort each group, and save as a separate CSV file in the 'results' subfolder
+        for day, group in result.groupby('Day'):
+            sorted_group = group.sort_values(by='Start_Time')
+            csv_file_path = os.path.join(results_folder, f'{day.replace(".xlsx", "")}.csv')
+            sorted_group.drop(['Day', 'Start_Time', 'End_Time'], axis=1, inplace=True)
+            
+            # Desired column order
+            desired_order = ['Subject', 'Class', 'Time']
 
-        # Rearrange columns
-        sorted_group = sorted_group[desired_order]
-        sorted_group.to_csv(csv_file_path, index=False)
+            # Rearrange columns
+            sorted_group = sorted_group[desired_order]
+            sorted_group.to_csv(csv_file_path, index=False)
 
-    # print("CSV files saved successfully in the 'results' subfolder after sorting and converting time to datetime.")
-
+        # print("CSV files saved successfully in the 'results' subfolder after sorting and converting time to datetime.")
+    
+    except:
+        '''
+            exam case
+        '''
+        for date, group in result.groupby('Days & Date'):
+            csv_file_path = os.path.join(results_folder, f'{date}.csv')
+            group.drop(['Days & Date'], axis=1, inplace=True)
+            
+            desired_order = ['Subject', 'Day_Name', 'Time']
+            # Rearrange columns
+            sorted_group = group[desired_order]
+            sorted_group.to_csv(csv_file_path, index=False)
+            
+def get_draft_version():
+    version_url = get_base_url() + 'get_version'
+    try:
+        response = requests.get(version_url)
+        response.raise_for_status()  # Raise an exception for 4XX or 5XX status codes
+        data = response.json()
+        return data.get('filename')
+    
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching draft version: {e}")
+        # You might want to handle or log the error in a better way
+        return None
+            
 # Function to update the timetable
 def update_timetable(base_url):
     st.info("Updating timetable...")  # You can customize the message
@@ -145,9 +174,9 @@ def allow_update(provided_datetime_str):
     else:
         return True, time_string
 
-def create_file():
+def create_file(folder='results'):
     # Specify the subfolder containing CSV files
-    csv_folder = 'results'
+    csv_folder = folder
 
     # Create a Word document
     doc = Document()
