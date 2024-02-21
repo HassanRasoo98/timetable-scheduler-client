@@ -99,10 +99,14 @@ def update_timetable(base_url):
         st.error(f"Failed to update timetable. Fatching timetable from previous version. Status code: {response.status_code}")
 
 # Function to read CSV files from a folder
-def read_csv_files(folder_path):
+def read_csv_files(folder_path, sort=False):
     csv_files = [file for file in os.listdir(folder_path) if file.endswith('.csv')]
+    
     # sort the files according to the day names
-    csv_files = sorted(csv_files, key=order_files)
+    if sort:
+        csv_files = sorted(csv_files, key=order_files)
+    else:
+        csv_files = sorted(csv_files)        
     
     # print('csv files : ', csv_files)
     dfs = {file: pd.read_csv(os.path.join(folder_path, file)) for file in csv_files}
