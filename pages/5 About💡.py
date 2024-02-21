@@ -29,7 +29,8 @@ Check back often to see what's coming! You can request for features and give sug
 # List of upcoming features
 features = [
     "Examination Seating Plan Manager",
-    "Clash Detection"
+    "Clash Detection",
+    "Improved Rating Mechanism"
 ]
 
 # Display upcoming features
