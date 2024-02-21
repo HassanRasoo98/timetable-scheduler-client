@@ -10,6 +10,7 @@ from utils import create_file, get_base_url, initialize_session_state, read_csv_
 st.set_page_config(
     page_title="Exam Scheduler (NEW!)",
     page_icon="🗓️",
+    layout="wide",
     initial_sidebar_state="collapsed",
 )
 
