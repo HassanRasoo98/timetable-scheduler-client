@@ -213,7 +213,7 @@ def create_file(folder='results'):
                 table.cell(row_num, col_num).text = str(value)
                 
     # Add the concluding lines
-    doc.add_paragraph("\nIf you enjoyed using this app, please provide feedback. "
+    doc.add_paragraph("\nThis Timetable was made automatically using the tool available at: https://isb-fastnuces-timetable-scheduler.streamlit.app/\nIf you enjoyed using this app, please provide feedback. "
                       "If you want to support upcoming projects like this one, "
                       "you can motivate me financially :)\n")
     doc.add_paragraph("01397991921003 - HBL")
