@@ -8,6 +8,9 @@ import requests
 import pandas as pd
 import streamlit as st
 from docx import Document
+from docx.shared import Pt
+from docx.oxml import OxmlElement
+from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 from datetime import datetime, timedelta, timezone
 from streamlit_star_rating import st_star_rating
 
@@ -231,13 +234,6 @@ def allow_update(provided_datetime_str):
 #     # # Convert Word document to PDF
 #     # convert("combined_data.docx", "combined_data.pdf")
 #     # print('PDF document saved.')
-
-from docx.shared import Pt
-from docx.oxml import OxmlElement
-from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
-from docx import Document
-import os
-import pandas as pd
 
 def create_file(folder='results'):
     # Specify the subfolder containing CSV files
