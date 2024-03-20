@@ -282,8 +282,8 @@ def create_file(folder='results'):
     footer_paragraph.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
 
     # Add the concluding lines to the footer
-    footer_paragraph.add_run("This Timetable was made automatically using the tool available at: ")
-    add_hyperlink(footer_paragraph, "https://isb-fastnuces-timetable-scheduler.streamlit.app/", "https://isb-fastnuces-timetable-scheduler.streamlit.app/")
+    footer_paragraph.add_run("This Timetable was made automatically using the tool ")
+    add_hyperlink(footer_paragraph, "https://isb-fastnuces-timetable-scheduler.streamlit.app/", "made by Hassan Rasool")
     footer_paragraph.add_run("\nIf you enjoyed using this app, please provide feedback. "
                              "If you want to support upcoming projects like this one, "
                              "you can motivate me financially :)")
@@ -304,10 +304,22 @@ def add_hyperlink(paragraph, url, text):
     new_run.append(OxmlElement('w:rPr'))
     new_run.text = text
     hyperlink.append(new_run)
-    r = paragraph.add_run()
-    r._r.append(hyperlink)
-    r.font.color.theme_color = MSO_THEME_COLOR_INDEX.HYPERLINK
-    r.font.underline = True
+    paragraph._p.append(hyperlink)  # Append the hyperlink to the paragraph
+    return hyperlink
+
+# def add_hyperlink(paragraph, url, text):
+#     part = paragraph.part
+#     r_id = part.relate_to(url, docx.opc.constants.RELATIONSHIP_TYPE.HYPERLINK, is_external=True)
+#     hyperlink = OxmlElement('w:hyperlink')
+#     hyperlink.set('{http://www.w3.org/1999/xlink}href', r_id, )
+#     new_run = OxmlElement('w:r')
+#     new_run.append(OxmlElement('w:rPr'))
+#     new_run.text = text
+#     hyperlink.append(new_run)
+#     r = paragraph.add_run()
+#     r._r.append(hyperlink)
+#     r.font.color.theme_color = MSO_THEME_COLOR_INDEX.HYPERLINK
+#     r.font.underline = True
 
 # You may need to define `order_files` function and import necessary modules like os, pd, and docx.
 
