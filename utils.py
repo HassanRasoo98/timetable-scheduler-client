@@ -237,6 +237,11 @@ def allow_update(provided_datetime_str):
 #     # convert("combined_data.docx", "combined_data.pdf")
 #     # print('PDF document saved.')
 
+from docx import Document
+from docx.shared import Pt
+from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
+from docx.oxml import OxmlElement
+
 def create_file(folder='results'):
     # Specify the subfolder containing CSV files
     csv_folder = folder
@@ -271,23 +276,18 @@ def create_file(folder='results'):
             for col_num, value in enumerate(row_data[1:], start=0):
                 table.cell(row_num, col_num).text = str(value)
                 
-    # Add the concluding lines
-    doc.add_paragraph("\nThis Timetable was made automatically using the tool available at: ")
-    add_hyperlink(doc.paragraphs[-1], "https://isb-fastnuces-timetable-scheduler.streamlit.app/", "https://isb-fastnuces-timetable-scheduler.streamlit.app/")
-    doc.add_paragraph("If you enjoyed using this app, please provide feedback. "
-                      "If you want to support upcoming projects like this one, "
-                      "you can motivate me financially :)")
-    doc.add_paragraph("01397991921003 - HBL")
+    # Add a footer to the document
+    footer = doc.sections[0].footer
+    footer_paragraph = footer.paragraphs[0]
+    footer_paragraph.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
 
-    # Set paragraph alignment for the concluding lines
-    for p in doc.paragraphs[-3:]:
-        p.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
-
-    # Set paragraph alignment and font size for the concluding lines
-    for paragraph in doc.paragraphs[-3:]:
-        paragraph.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
-        for run in paragraph.runs:
-            run.font.size = Pt(10)
+    # Add the concluding lines to the footer
+    footer_paragraph.add_run("This Timetable was made automatically using the tool available at: ")
+    add_hyperlink(footer_paragraph, "https://isb-fastnuces-timetable-scheduler.streamlit.app/", "https://isb-fastnuces-timetable-scheduler.streamlit.app/")
+    footer_paragraph.add_run("\nIf you enjoyed using this app, please provide feedback. "
+                             "If you want to support upcoming projects like this one, "
+                             "you can motivate me financially :)")
+    footer_paragraph.add_run("\n01397991921003 - HBL")
 
     if os.path.exists('combined_data.docx'):
         os.remove('combined_data.docx')
@@ -309,8 +309,8 @@ def add_hyperlink(paragraph, url, text):
     r.font.color.theme_color = MSO_THEME_COLOR_INDEX.HYPERLINK
     r.font.underline = True
 
-# You may need to define `order_files` function and import necessary modules like docx and MSO_THEME_COLOR_INDEX
-    
+# You may need to define `order_files` function and import necessary modules like os, pd, and docx.
+
 # Function to fetch current rating from the server
 def fetch_current_rating(base_url):
     # Assuming your server provides the current rating at the '/current-rating' endpoint
