@@ -282,8 +282,9 @@ def create_file(folder='results'):
     footer_paragraph.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
 
     # Add the concluding lines to the footer
-    footer_paragraph.add_run("This Timetable was made automatically using the tool ")
-    footer_paragraph.add_hyperlink("made by Hassan Rasool", address = "https://isb-fastnuces-timetable-scheduler.streamlit.app/")
+    # footer_paragraph.add_run("This Timetable was made automatically using the tool ")
+    paragraph = document.add_paragraph("This Timetable was made automatically using the tool ")
+    paragraph.add_hyperlink("Made by Hassan Rasool", address = "https://isb-fastnuces-timetable-scheduler.streamlit.app/")
     footer_paragraph.add_run("\nIf you enjoyed using this app, please provide feedback. "
                              "If you want to support upcoming projects like this one, "
                              "you can motivate me financially :)")
