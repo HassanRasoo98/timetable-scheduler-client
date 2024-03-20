@@ -7,6 +7,7 @@ import shutil
 import requests
 import pandas as pd
 import streamlit as st
+import docx
 from docx import Document
 from docx.shared import Pt
 from docx.oxml import OxmlElement
