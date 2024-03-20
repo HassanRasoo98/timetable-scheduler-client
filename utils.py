@@ -12,6 +12,7 @@ from docx import Document
 from docx.shared import Pt
 from docx.oxml import OxmlElement
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
+from docx.enum.dml import MSO_THEME_COLOR_INDEX
 from datetime import datetime, timedelta, timezone
 from streamlit_star_rating import st_star_rating
 
