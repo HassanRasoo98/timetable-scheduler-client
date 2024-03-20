@@ -283,7 +283,7 @@ def create_file(folder='results'):
 
     # Add the concluding lines to the footer
     # footer_paragraph.add_run("This Timetable was made automatically using the tool ")
-    paragraph = Document.add_paragraph("This Timetable was made automatically using the tool ")
+    paragraph = doc.add_paragraph("This Timetable was made automatically using the tool ")
     paragraph.add_hyperlink("Made by Hassan Rasool", address = "https://isb-fastnuces-timetable-scheduler.streamlit.app/")
     footer_paragraph.add_run("\nIf you enjoyed using this app, please provide feedback. "
                              "If you want to support upcoming projects like this one, "
