@@ -283,9 +283,11 @@ def create_file(folder='results'):
     for p in doc.paragraphs[-3:]:
         p.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
 
-    # Set font size for concluding lines
-    for run in doc.paragraphs[-3:].runs:
-        run.font.size = Pt(10)
+    # Set paragraph alignment and font size for the concluding lines
+    for paragraph in doc.paragraphs[-3:]:
+        paragraph.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+        for run in paragraph.runs:
+            run.font.size = Pt(10)
 
     if os.path.exists('combined_data.docx'):
         os.remove('combined_data.docx')
