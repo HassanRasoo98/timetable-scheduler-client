@@ -178,6 +178,67 @@ def allow_update(provided_datetime_str):
     else:
         return True, time_string
 
+# def create_file(folder='results'):
+#     # Specify the subfolder containing CSV files
+#     csv_folder = folder
+
+#     # Create a Word document
+#     doc = Document()
+#     doc.add_heading('Timetable Spring 2024', level=0)  # Add the title
+    
+#     files = os.listdir(csv_folder)
+#     files = sorted(files, key=order_files)
+
+#     # Loop through all CSV files in the subfolder
+#     for csv_file in files:
+#         # Read the CSV file into a Pandas DataFrame
+#         df = pd.read_csv(os.path.join(csv_folder, csv_file))
+
+#         title = csv_file.split('.')[0]
+#         # Add a section for the CSV file name
+#         doc.add_heading(title, level=1)
+
+#         # Add a table to the Word document
+#         num_rows, num_cols = df.shape
+#         table = doc.add_table(rows=num_rows + 1, cols=num_cols)
+#         table.autofit = True
+
+#         # Add column headers to the table
+#         for col_num, col_name in enumerate(df.columns):
+#             table.cell(0, col_num).text = col_name
+
+#         # Add data to the table
+#         for row_num, row_data in enumerate(df.itertuples(), start=1):
+#             for col_num, value in enumerate(row_data[1:], start=0):
+#                 table.cell(row_num, col_num).text = str(value)
+                
+#     # Add the concluding lines
+#     doc.add_paragraph("\nThis Timetable was made automatically using the tool available at: https://isb-fastnuces-timetable-scheduler.streamlit.app/\nIf you enjoyed using this app, please provide feedback. "
+#                       "If you want to support upcoming projects like this one, "
+#                       "you can motivate me financially :)\n")
+#     doc.add_paragraph("01397991921003 - HBL")
+                
+#     if os.path.exists('combined_data.docx'):
+#         os.remove('combined_data.docx')
+
+#     # if os.path.exists('combined_data.pdf'):
+#     #     os.remove('combined_data.pdf')
+
+#     # Save the Word document
+#     doc.save('combined_data.docx')
+#     # print('Word document saved.')
+
+#     # # Convert Word document to PDF
+#     # convert("combined_data.docx", "combined_data.pdf")
+#     # print('PDF document saved.')
+
+from docx.shared import Pt
+from docx.oxml import OxmlElement
+from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
+from docx import Document
+import os
+import pandas as pd
+
 def create_file(folder='results'):
     # Specify the subfolder containing CSV files
     csv_folder = folder
@@ -213,24 +274,42 @@ def create_file(folder='results'):
                 table.cell(row_num, col_num).text = str(value)
                 
     # Add the concluding lines
-    doc.add_paragraph("\nThis Timetable was made automatically using the tool available at: https://isb-fastnuces-timetable-scheduler.streamlit.app/\nIf you enjoyed using this app, please provide feedback. "
+    doc.add_paragraph("\nThis Timetable was made automatically using the tool available at: ")
+    add_hyperlink(doc.paragraphs[-1], "https://isb-fastnuces-timetable-scheduler.streamlit.app/", "https://isb-fastnuces-timetable-scheduler.streamlit.app/")
+    doc.add_paragraph("If you enjoyed using this app, please provide feedback. "
                       "If you want to support upcoming projects like this one, "
-                      "you can motivate me financially :)\n")
+                      "you can motivate me financially :)")
     doc.add_paragraph("01397991921003 - HBL")
-                
+
+    # Set paragraph alignment for the concluding lines
+    for p in doc.paragraphs[-3:]:
+        p.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+
+    # Set font size for concluding lines
+    for run in doc.paragraphs[-3:].runs:
+        run.font.size = Pt(10)
+
     if os.path.exists('combined_data.docx'):
         os.remove('combined_data.docx')
 
-    # if os.path.exists('combined_data.pdf'):
-    #     os.remove('combined_data.pdf')
-
     # Save the Word document
     doc.save('combined_data.docx')
-    # print('Word document saved.')
 
-    # # Convert Word document to PDF
-    # convert("combined_data.docx", "combined_data.pdf")
-    # print('PDF document saved.')
+def add_hyperlink(paragraph, url, text):
+    part = paragraph.part
+    r_id = part.relate_to(url, docx.opc.constants.RELATIONSHIP_TYPE.HYPERLINK, is_external=True)
+    hyperlink = OxmlElement('w:hyperlink')
+    hyperlink.set('{http://www.w3.org/1999/xlink}href', r_id, )
+    new_run = OxmlElement('w:r')
+    new_run.append(OxmlElement('w:rPr'))
+    new_run.text = text
+    hyperlink.append(new_run)
+    r = paragraph.add_run()
+    r._r.append(hyperlink)
+    r.font.color.theme_color = MSO_THEME_COLOR_INDEX.HYPERLINK
+    r.font.underline = True
+
+# You may need to define `order_files` function and import necessary modules like docx and MSO_THEME_COLOR_INDEX
     
 # Function to fetch current rating from the server
 def fetch_current_rating(base_url):
