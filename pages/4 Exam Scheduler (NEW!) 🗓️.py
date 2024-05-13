@@ -91,6 +91,8 @@ if st.button("Make Schedule"):
             st.markdown('''Disclaimer: It is advisable to compare this timetable once with the original 
                         one provided by the university to minimize any error. 
                         Please report any inconsistencies!''', )
+        else:
+            st.error('''An error ocurred. Please contact the developers to get the issue fixed.''')
 
 st.divider()
 
