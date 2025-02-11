@@ -3,6 +3,7 @@ This repository contains the backend code for the client side of the timetable v
 Use the app on this link: https://isb-fastnuces-timetable-scheduler.streamlit.app/
 
 # Note
+This is the client applicaiton. The code for the server side can be accessed at https://github.com/HassanRasoo98/timetable-scheduler-server
 This application is no longer being maintained because I have passed out from FAST. I am looking for volunteers who want to continue this project.
 
 # Demo Video
